@@ -1,49 +1,52 @@
-import React, { Component } from 'react';
+import React, { useCallback,useState } from 'react';
 import { ActionSheet } from 'react-weui'
 import config from '../../../../config';
 
-export default class TypeSelect extends Component{
-    constructor(props){
-        super(props);
-        const initMenus = function(fn){
-            let menus = [];
+function TypeSelect(props){
+    const {
+        show,
+        requsetData,
+        close
+    }=props;
+
+    const initMenus = useCallback((fn)=>{
+        let menus = [];
             for( let key in config.userTypeName){
                 menus.push({
                     label:config.userTypeName[key],
                     onClick:()=>{fn(key)}
                 })
             }
-            return menus;
-        }
-        this.state = {
-            menus:initMenus(this.menuClickHandle),
-            actions:[
-                {
-                    label: 'Cancel',
-                    onClick: this.closeHandle
-                }
-            ]
-        }
-    }
-    render(){
-        
-        return (
-            <ActionSheet
-            type='android'
-            show = { this.props.show }
-            menus = { this.state.menus }
-            actions={ this.state.actions }
-            onRequestClose={this.closeHandle}
-            />
-        )
+        return menus;
+    },[])
+    
+    const closeHandle = ()=>{
+        close()
     }
 
-    menuClickHandle = (typeId)=>{
-        this.props.requsetData(typeId)
-        this.closeHandle()
+    const menuClickHandle = (typeId)=>{
+        requsetData(typeId)
+        closeHandle()
     }
 
-    closeHandle = ()=>{
-        this.props.close()
-    }
+    const [stateMenus] = useState(initMenus(menuClickHandle));
+    const [stateActions] = useState([
+        {
+            label: 'Cancel',
+            onClick: closeHandle
+        }
+    ]);
+
+    return (
+        <ActionSheet
+        type='android'
+        show = { show }
+        menus = { stateMenus }
+        actions={ stateActions }
+        onRequestClose={closeHandle}
+        />
+    )
+
 }
+
+export default TypeSelect;

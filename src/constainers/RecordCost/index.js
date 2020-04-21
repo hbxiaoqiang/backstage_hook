@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useCallback,useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { RecordCostStyle } from './style';
@@ -8,6 +8,7 @@ import GiveList from './component/GiveList';
 import { selector,actions } from '../../redux/modules/recordCost'
 import { getDateStr } from '../../until/tools';
 import LineTit from '../../component/LineTit';
+import useListenerScoll from '../../ownHook/useListenerScoll';
 
 const param ={}
 const titleName = {
@@ -48,70 +49,65 @@ const backParam = (type,sdt=getDateStr.getMothOnDay(),edt=getDateStr.CurDate()) 
     }
 }
 
-class RecordCost extends Component {
-    render() {
-        const type = this.props.match.params.type
-        return (
-            <RecordCostStyle>
-                <Header 
-                 title = {`${titleName[type]}记录`}
-                 backHandle={this.props.history.goBack}
-                />
-                {
-                    this.props.dates.startTime?
-                   (
-                    <LineTit 
-                    titleTxt = { this.props.dates.startTime + '至' + this.props.dates.endTime }
-                    />
-                   ):null
-                }
-                {
-                    type === 'record'?
-                    (
-                        <TotalList 
-                        datas={ this.props.datas }
-                        />
-                    ):null
-                }
-                {
-                    type === 'give'||type === 'recharge'?
-                    (
-                        <GiveList 
-                        datas={ this.props.datas }
-                        />
-                    ):null
-                }
-                
-            </RecordCostStyle>
-        );
-    }
+function RecordCost(props){
+    const {
+        history,
+        dates,
+        datas,
+        loadMore,
+        match,
+        actions,
+    }=props;
 
+    const type = match.params.type;
 
-    componentDidMount(){
-        Object.assign(param,backParam(this.props.match.params.type))
-        this.requestDatas();
-        window.addEventListener('scroll', this.loadMoreEvent);
-    }
-
-    componentWillUnmount() {
-        this.props.actions.clearData();    
-        window.removeEventListener('scroll', this.loadMoreEvent);
-    }
-
-    requestDatas = () => {
-        if(this.props.loadMore){
+    const requestDatas = useCallback(() => {
+        if(loadMore){
             Object.assign(param, { page: ++param.page })
-            this.props.actions.pagedList(param);
+            actions.pagedList(param);
         }
-    }
+    },[loadMore,actions]);
 
-    loadMoreEvent = () => {
-        if (document.documentElement.scrollTop + 50 >=
-            document.documentElement.scrollHeight - document.documentElement.clientHeight) {
-            this.requestDatas()
-        }
-    }
 
+    useEffect(()=>{
+        Object.assign(param,backParam(match.params.type))
+    })
+
+    useListenerScoll(requestDatas,actions.clearData)
+
+    return (
+        <RecordCostStyle>
+            <Header 
+             title = {`${titleName[type]}记录`}
+             backHandle={history.goBack}
+            />
+            {
+                dates.startTime?
+               (
+                <LineTit 
+                titleTxt = { dates.startTime + '至' + dates.endTime }
+                />
+               ):null
+            }
+            {
+                type === 'record'?
+                (
+                    <TotalList 
+                    datas={ datas }
+                    />
+                ):null
+            }
+            {
+                type === 'give'||type === 'recharge'?
+                (
+                    <GiveList 
+                    datas={ datas }
+                    />
+                ):null
+            }
+            
+        </RecordCostStyle>
+    );
 }
 
 const mapStateToProps = state => ({

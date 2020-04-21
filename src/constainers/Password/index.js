@@ -1,25 +1,27 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { PasswordStyle } from './style';
 import Header from '../../component/Header';
 import { updatePasswod } from '../../redux/modules/password'
 import Body from './component/Body'
 
-class Password extends Component {
-    render() {
-        return (
-            <PasswordStyle>
-                <Header 
-                 title = '修改密码'
-                 backBtn = '返回'
-                 backHandle={this.props.history.goBack}
-                />
-                <Body 
-                updatePassword = { this.props.updatePassword }
-                />
-            </PasswordStyle>
-        );
-    }
+function Password(props){
+    const {
+        history:{goBack},
+        updatePassword
+     } = props;
+    return (
+        <PasswordStyle>
+            <Header 
+             title = '修改密码'
+             backBtn = '返回'
+             backHandle={goBack}
+            />
+            <Body 
+            updatePassword = { updatePassword }
+            />
+        </PasswordStyle>
+    );
 }
 
 const mapDispatchToProps = dispatch =>({

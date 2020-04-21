@@ -1,4 +1,4 @@
-import React , { Component } from 'react';
+import React , { useMemo,useCallback,useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getUserInfo, actions as appActions } from '../../../redux/modules/app';
@@ -8,37 +8,50 @@ import LineTitle from '../../../component/LineTit';
 import Program from './component/program';
 import { HallStyle } from './style';
 
-class Hall extends Component{
-    render(){
-        return (
-            <HallStyle className='Home'>
-                {
-                    this.props.userInfo.UserId?(
-                        <Header 
-                            appName={config.appName[config.partnerId]}
-                            exitLogin={ this.onExit }
-                            imgUrl={
-                                config.serverIp+config.imgPath+this.props.userInfo.UserId+".jpg"
-                            }
-                            nickName={this.props.userInfo.NickName}
-                            typeName={config.userTypeName[this.props.userInfo.TypeId]}
-                        />
-                    ):null
-                }
-                <LineTitle titleTxt='类目'/>
-                <Program typeId={this.props.userInfo.TypeId} />
-            </HallStyle>
-        )
-    }
+function Hall(props) {
+    const {
+        userInfo,
+        history,
+        onExit,
+        getFristOrDefaul
+    } = props;
 
-    componentDidMount(){
-        this.props.getFristOrDefaul();
-    }
+    const headImg = useMemo(()=>{
+        return config.serverIp+config.imgPath+userInfo.UserId+".jpg"
+    },[userInfo])
 
-    onExit=()=>{
-        this.props.onExit();
-        this.props.history.push('/');
-    }
+    const appName = useMemo(()=>{
+        return config.appName[config.partnerId];
+    },[])
+
+    const onExitCall = useCallback(()=>{
+        onExit();
+        history.push('/');
+    },[onExit,history])
+
+    useEffect(()=>{
+        getFristOrDefaul()
+    },[getFristOrDefaul]);
+
+    return (
+        <HallStyle className='Home'>
+            {
+                userInfo.UserId?(
+                    <Header 
+                        appName={appName}
+                        exitLogin={ onExitCall }
+                        imgUrl={
+                            headImg
+                        }
+                        nickName={userInfo.NickName}
+                        typeName={config.userTypeName[userInfo.TypeId]}
+                    />
+                ):null
+            }
+            <LineTitle titleTxt='类目'/>
+            <Program typeId={userInfo.TypeId} />
+        </HallStyle>
+    )
 }
 
 const mapStateToProps=(state)=>({

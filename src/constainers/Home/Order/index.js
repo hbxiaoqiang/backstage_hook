@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useMemo,useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Header from '../../../component/Header';
@@ -13,44 +13,45 @@ import {
     actions as orderActions, getTotalData, getDateTimer,
     getRecords, getDiyTime
 } from '../../../redux/modules/order';
-class Order extends Component {
-    render() {
-        const { orderActions: { statistics, diyTime }, diy,
+
+function Order(props){
+    const { orderActions: { statistics, diyTime }, diy,
             date: { startTime, endTime },
             totalData: { fangkaCost, playerRech },
             records
-        } = this.props;
-        return (
-            <OrderStyle>
-                <Header title='充值统计' />
-                <DateTab
-                    getData={statistics}
-                    diy={diyTime}
-                />
-                <DateSelect
-                    active={diy}
-                    getData={statistics}
-                />
-                <LineTit
-                    titleTxt={dateTxt(startTime, endTime)}
-                />
-                <TotalCount
-                    fangkaCost={fangkaCost}
-                    playerRech={playerRech}
-                />
-                <CountList
-                    counts={records}
-                />
-            </OrderStyle>
-        )
-    }
+        } = props;
+    
+    const lineTit = useMemo(()=>{
+        return dateTxt(startTime, endTime)
+    },[startTime,endTime])
 
-    componentDidMount() {
-        const { orderActions: { statistics },
-            date: { startTime, endTime }
-        } = this.props
+    useEffect(()=>{
         statistics(startTime, endTime)
-    }
+    },[startTime,endTime,statistics])
+
+    return (
+        <OrderStyle>
+            <Header title='充值统计' />
+            <DateTab
+                getData={statistics}
+                diy={diyTime}
+            />
+            <DateSelect
+                active={diy}
+                getData={statistics}
+            />
+            <LineTit
+                titleTxt={lineTit}
+            />
+            <TotalCount
+                fangkaCost={fangkaCost}
+                playerRech={playerRech}
+            />
+            <CountList
+                counts={records}
+            />
+        </OrderStyle>
+    )
 }
 
 const mapStateToProps = state => ({

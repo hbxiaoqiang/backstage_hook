@@ -1,46 +1,36 @@
-import React, { Component,Fragment } from 'react';
+import React, { useState,Fragment } from 'react';
 import { Button, ButtonArea,Form,FormCell,CellBody,TextArea } from 'react-weui';
 
-class TextAreaPost extends Component {
-    constructor(props) {
-        super(props);
-        this.state={
-            value:''
-        }
-    }
+function TextAreaPost(props){
+    const [value,setValue] = useState('');
     
-    render() {
-        return (
-            <Fragment>
-                 <Form>
-                <FormCell>
-                    <CellBody>
-                        <TextArea
-                        value={this.state.value}
-                        onChange={this.changeHandle}
-                        placeholder="请输入内容" rows="3" maxLength={200}></TextArea>
-                    </CellBody>
-                </FormCell>
-            </Form>
-            <ButtonArea>
-                <Button
-                onClick={ this.clickHandle }
-                type="default">提交</Button>
-            </ButtonArea>
-            </Fragment>
-        );
+    const changeHandle = e => {
+        setValue(e.target.value)
     }
 
-    changeHandle = e => {
-        const value = e.target.value;
-        this.setState(()=>({
-            value
-        }))
+    const clickHandle = () => {
+        this.props.postData(value);
     }
 
-    clickHandle = () => {
-        this.props.postData(this.state.value);
-    }
+    return (
+        <Fragment>
+             <Form>
+            <FormCell>
+                <CellBody>
+                    <TextArea
+                    value={value}
+                    onChange={changeHandle}
+                    placeholder="请输入内容" rows="3" maxLength={200}></TextArea>
+                </CellBody>
+            </FormCell>
+        </Form>
+        <ButtonArea>
+            <Button
+            onClick={ clickHandle }
+            type="default">提交</Button>
+        </ButtonArea>
+        </Fragment>
+    );
 }
 
 export default TextAreaPost;

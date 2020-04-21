@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Form,FormCell,CellHeader,Label,CellBody,Input,ButtonArea ,Button,Dialog } from 'react-weui';
 import { Page } from './style';
 import { connect } from 'react-redux';
@@ -7,73 +7,80 @@ import { actions as loginActions, getUserName, getPassWord, getTipInfo } from '.
 import { getUserInfo } from '../../redux/modules/app'
 import { Redirect } from 'react-router-dom';
 
-class Login extends Component{
-    render(){
-        if(this.props.userInfo.UserName){
-            return (
-                <Redirect to='/home' />
-            )
-        }
+function Login(props){
+    const {
+        userName,
+        passWord,
+        tipInfo,
+        loginActions,
+        userInfo
+    } =props;
+
+
+    const handleUserName=(e)=>{
+        loginActions.inputUserName(e.target.value);
+    }
+
+    const handlePassWord=(e)=>{
+        loginActions.inputPassWord(e.target.value);
+    }
+
+    const submit=()=>{
+        loginActions.submitData()
+    }
+
+    if(userInfo.UserName){
         return (
-            <>
-            <Page>
-                <div className="page__hd">
-                    <h1 className="page__title">登陆后台</h1>
-                    <p className="page__desc">非管理员账号不可登陆</p>
-                </div>
-                <div className="page_bd">
-                    <Form>
-                        <FormCell>
-                            <CellHeader>
-                                <Label>账号</Label>
-                            </CellHeader>
-                            <CellBody>
-                                <Input type="text" value={this.props.userName}
-                                 onChange={this.handleUserName} placeholder="请输入账号"/>
-                            </CellBody>
-                        </FormCell>
-                        <FormCell>
-                            <CellHeader>
-                                <Label>密码</Label>
-                            </CellHeader>
-                            <CellBody>
-                                <Input type="password" value={this.props.passWord}
-                                onChange={this.handlePassWord} placeholder="请输入密码"/>
-                            </CellBody>
-                        </FormCell>
-                    </Form>
-                    <ButtonArea>
-                        <Button href="#!" onClick={ this.submit }>登录</Button>
-                    </ButtonArea>
-                </div>
-            </Page>
-            {
-                this.props.tipInfo?(
-                    <Dialog type='ios' title='提示' buttons={[
-                        {
-                            label: '确定',
-                            onClick: this.props.loginActions.clearTip
-                        }
-                    ]} show={true}>
-                        {this.props.tipInfo}
-                    </Dialog>
-                ):null
-            }
-            </>
+            <Redirect to='/home' />
         )
     }
-
-    handleUserName=(e)=>{
-        this.props.loginActions.inputUserName(e.target.value);
-    }
-
-    handlePassWord=(e)=>{
-        this.props.loginActions.inputPassWord(e.target.value);
-    }
-
-    submit=()=>{
-        this.props.loginActions.submitData()
-    }
+    return (
+        <>
+        <Page>
+            <div className="page__hd">
+                <h1 className="page__title">登陆后台</h1>
+                <p className="page__desc">非管理员账号不可登陆</p>
+            </div>
+            <div className="page_bd">
+                <Form>
+                    <FormCell>
+                        <CellHeader>
+                            <Label>账号</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input type="text" value={userName}
+                             onChange={handleUserName} placeholder="请输入账号"/>
+                        </CellBody>
+                    </FormCell>
+                    <FormCell>
+                        <CellHeader>
+                            <Label>密码</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input type="password" value={passWord}
+                            onChange={handlePassWord} placeholder="请输入密码"/>
+                        </CellBody>
+                    </FormCell>
+                </Form>
+                <ButtonArea>
+                    <Button href="#!" onClick={ submit }>登录</Button>
+                </ButtonArea>
+            </div>
+        </Page>
+        {
+            tipInfo?(
+                <Dialog type='ios' title='提示' buttons={[
+                    {
+                        label: '确定',
+                        onClick: loginActions.clearTip
+                    }
+                ]} show={true}>
+                    {tipInfo}
+                </Dialog>
+            ):null
+        }
+        </>
+    )
 }
 
 const mapStateToProps= (state,props)=>({

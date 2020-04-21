@@ -17,7 +17,7 @@ function Gather(props){
         actions:{userBigSta,diyTime:setDiyTime},
         dateTimes: { startTime, endTime },
         totalData
-    } = this.props;
+    } = props;
 
     useEffect(()=>{
         userBigSta(startTime, endTime)
